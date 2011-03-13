@@ -12,7 +12,7 @@ def set_options(opt):
 def configure(conf):
   conf.check_tool('compiler_cxx')
   conf.check_tool('node_addon')
-  conf.env.append_value("LIBPATH_KD", '/usr/local/lib')
+  conf.env.append_value("LIBPATH_KD", '/usr/lib')
   conf.env.append_value("LIB_KD", 'kdtree')
 
 def build(bld):
