@@ -7,7 +7,7 @@ node-kdtree is a node.js Addon that defines a wrapper to libkdtree, allowing one
 ## Dependencies
 The [kdtree](http://code.google.com/p/kdtree/) library is required. In order to install, get the latest version from [here](http://code.google.com/p/kdtree/downloads/list) and run the following commands:
 
-   ./configure
-   make
-   sudo make install PREFIX=/usr 
+    ./configure
+    make
+    sudo make install PREFIX=/usr 
 
