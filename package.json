@@ -4,4 +4,13 @@
 , "author": "Justin Ethier"
 , "main": "./kdtree"
 , "scripts": { "install": "node-waf configure build" }
+, "repository" :
+  { "type" : "git"
+  , "url" : "git://github.com/justinethier/node-kdtree"
+  }
+, "licenses" :
+  [ { "type" : "MIT"
+    , "url" : "http://github.com/justinethier/node-kdtree/raw/master/LICENSE"
+    }
+  ]
 }
