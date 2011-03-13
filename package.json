@@ -1,0 +1,7 @@
+{ "name" : "kdtree"
+, "version" : "0.0.1"
+, "description" : "Basic libkdtree binding to node"
+, "author": "Justin Ethier"
+, "main": "./kdtree"
+, "scripts": { "install": "node-waf configure build" }
+}
