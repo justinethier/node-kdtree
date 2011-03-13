@@ -16,3 +16,12 @@ Coming soon!
 
 ## API
 Coming soon!
+
+
+##Credits
+
+node-kdtree is developed by [Justin Ethier](http://github.com/justinethier).
+
+Thanks to [John Tsiombikas](nuclear@siggraph.org) for developing libkdtree!
+
+Patches are welcome; please send via pull request on github.
