@@ -5,6 +5,9 @@
  * Please use github to submit patches and bug reports:
  * https://github.com/justinethier/node-kdtree
  */
+
+// TODO: publish via npm. see: https://github.com/isaacs/npm/blob/master/doc/developers.md#readme
+//
 #include <v8.h>
 #include <node.h>
 #include <node_events.h>
@@ -27,11 +30,10 @@ class KDTree : public ObjectWrap {
         t->InstanceTemplate()->SetInternalFieldCount(1);
         t->SetClassName(String::NewSymbol("KDTree"));
 
-        NODE_SET_PROTOTYPE_METHOD(t, "test", Test);
+        NODE_SET_PROTOTYPE_METHOD(t, "test", Test); // TODO: this will go away...
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
         NODE_SET_PROTOTYPE_METHOD(t, "nearest", Nearest);
 //        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange); // kd_nearest_range
-//        NODE_SET_PROTOTYPE_METHOD(t, "clear", Clear); // kd_clear
 
         target->Set(String::NewSymbol("KDTree"), t->GetFunction());
     }

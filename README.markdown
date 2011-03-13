@@ -11,3 +11,8 @@ The [kdtree](http://code.google.com/p/kdtree/) library is required. In order to 
     make
     sudo make install PREFIX=/usr 
 
+## Usage
+Coming soon!
+
+## API
+Coming soon!
