@@ -47,21 +47,24 @@ class KDTree : public ObjectWrap {
     Handle<Value>
     Nearest(const double *pos){
       int rpos;
-      char *pdata;
+      void *pdata;
       kdres *results = kd_nearest(kd_, pos);
       Local<Array> rv = Array::New(dim_ + 1);
 
       if (results == NULL){}
       else{
         double *respos = (double *)(malloc(sizeof(double) * dim_));
-        pdata = (char *)kd_res_item(results, respos); 
+        pdata = (void *)kd_res_item(results, respos); 
 
         for(rpos = 0; rpos < dim_; rpos++){
           rv->Set(rpos, Number::New(respos[rpos])); 
         }
 
-        rv->Set(dim_, // TODO: append data element here
-        Number::New(respos[rpos])); 
+// TODO: any way to get that data back?
+//Handle<Value> hdata = Handle::Cast((Value *)pdata);
+//        rv->Set(dim_, // TODO: append data element here
+//         Number::New( (void *)pdata ));
+//        Number::New(respos[rpos])); 
        
         free(respos);
         kd_res_free(results);
