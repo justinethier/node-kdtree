@@ -21,3 +21,11 @@ console.log( tree.nearest(1, 11, 4) );
 console.log( tree.nearest(100, 11000, 4000) );
 console.log( tree.nearest(100, -11000, 4000) );
 console.log( tree.nearest(1, 0, 0) );
+/* TODO: this does not work. 
+ *       it would be nice for the addon to support having multiple trees...
+var tree2 = new kd.KDTree(3);
+tree2.insert(10, 10, 10);
+tree2.insert(1, 2, 3);
+tree2.insert(1, 1.9, 3);
+console.log( tree2.nearest(10, 10, 10) );*/
+console.log( tree.nearest(10, 10, 10) );
