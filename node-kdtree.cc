@@ -39,8 +39,8 @@ class KDTree : public ObjectWrap {
     }
 
     // TODO: allow insertion of (string?) data
-    bool Insert(const double *pos){
-      return (kd_insert(kd_, pos, 0) == 0);
+    bool Insert(const double *pos, Handle<Value> data){
+      return (kd_insert(kd_, pos, *data) == 0);
     }
 
     // Allow retrieval of (string?) data
@@ -59,6 +59,9 @@ class KDTree : public ObjectWrap {
         for(rpos = 0; rpos < dim_; rpos++){
           rv->Set(rpos, Number::New(respos[rpos])); 
         }
+
+        rv->Set(dim_, // TODO: append data element here
+        Number::New(respos[rpos])); 
        
         free(respos);
         kd_res_free(results);
@@ -122,7 +125,11 @@ class KDTree : public ObjectWrap {
 // validate that num args == dim_
 //
       // TODO: may want to pass Length down, so class can assert == dim_ 
-      Handle<Value> result = Boolean::New( kd->Insert(pos) );
+      Handle<Value> result = Boolean::New( kd->Insert(pos,
+          Persistent<Value>::New(args[0]) // Test code, just stuff number as data for now...
+                                    // Eventually will want API to allow an optional data arg.
+                                    // If not specified, will default to something (null?)
+          ) );
       free(pos);
       return result;
     }
@@ -138,7 +145,8 @@ class KDTree : public ObjectWrap {
       }
 
       // TODO: may want to pass Length down, so class can assert == dim_ 
-      Handle<Value> result = kd->Nearest(pos);
+      Handle<Value> result = kd->Nearest(pos); 
+        
       free(pos);
       return result;
     }
@@ -171,7 +179,7 @@ class KDTree : public ObjectWrap {
     }
 
     ~KDTree(){
-      // TODO: should probably call this to clean up allocated 'data' elements
+      // TODO: need to call this to clean up allocated 'data' elements
       //       see the kdtree docs:
 //      void kd_data_destructor(struct kdtree *tree, void (*destr)(void*));
         if (kd_ != NULL){
