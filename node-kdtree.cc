@@ -116,6 +116,11 @@ class KDTree : public ObjectWrap {
 
 // TODO: pass data parameter down using a persistent handle?
 // http://izs.me/v8-docs/classv8_1_1Persistent.html#_details
+//
+// TODO:
+// if this is the case, need to pass as arg, then in Insert() need to
+// validate that num args == dim_
+//
       // TODO: may want to pass Length down, so class can assert == dim_ 
       Handle<Value> result = Boolean::New( kd->Insert(pos) );
       free(pos);
