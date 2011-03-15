@@ -10,7 +10,7 @@
 var kd = require('kdtree');
 var tree = new kd.KDTree(4);
 
-console.log( "Loading data into tree..." );
+console.log( "Loading data into tree, this may take awhile..." );
 var i = 0;
 for (var x = 0; x < 75; x++){
   for (var y = 0; y < 75; y++){
