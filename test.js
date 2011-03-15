@@ -20,11 +20,14 @@ console.log( tree.nearest(1, 11, 4) );
 console.log( tree.nearest(100, 11000, 4000) );
 console.log( tree.nearest(100, -11000, 4000) );
 console.log( tree.nearest(1, 0, 0) );
-/* TODO: this does not work. 
- *       it would be nice for the addon to support having multiple trees...
-var tree2 = new kd.KDTree(3);
-tree2.insert(10, 10, 10);
-tree2.insert(1, 2, 3);
-tree2.insert(1, 1.9, 3);
-console.log( tree2.nearest(10, 10, 10) );*/
+
+// Test using a second tree of different dimension
+var tree2 = new kd.KDTree(4);
+tree2.insert(10, 10, 10, 10, "10x4 test");
+tree2.insert(1, 2, 3, 4, "A 4-dimensional point");
+tree2.insert(1, 1.9, 3, 4, "Another 4-dimensional point");
+console.log( tree2.nearest(10, 10, 10, 10) );
+console.log( tree2.nearest(1, 10, 10, 1) );
+
+// Test that first tree still works...
 console.log( tree.nearest(10, 10, 10) );
