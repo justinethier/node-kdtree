@@ -18,3 +18,4 @@ for (var x = 0; x < 75; x++){
       tree.insert(x, y, z, "element #" + i++); }}}
 console.log( "Done loading the tree" );
 console.log( tree.nearest(9.5, 19.5, 31.5) );
+console.log( tree.nearest(0, 0, 0) );

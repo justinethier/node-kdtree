@@ -7,7 +7,6 @@
  */
 var kd = require('kdtree');
 var tree = new kd.KDTree();
-tree.test();
 // TODO: put all  insert data into a big list, and print that list out here...
 tree.insert(1, 2, 3);
 tree.insert(1, 1.9, 3);
