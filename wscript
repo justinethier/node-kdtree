@@ -2,7 +2,7 @@
 #
 # make install PREFIX=/usr
 #
-srcdir = '.'
+srcdir = 'src'
 blddir = 'build'
 VERSION = '0.0.1'
 
@@ -18,5 +18,5 @@ def configure(conf):
 def build(bld):
   obj = bld.new_task_gen('cxx', 'shlib', 'node_addon')
   obj.target = 'kdtree'
-  obj.source = 'node-kdtree.cc'
+  obj.source = 'src/node-kdtree.cc'
   obj.uselib = 'KD'
