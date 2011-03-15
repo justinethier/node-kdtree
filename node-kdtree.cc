@@ -38,12 +38,31 @@ class KDTree : public ObjectWrap {
         target->Set(String::NewSymbol("KDTree"), t->GetFunction());
     }
 
-    // TODO: allow insertion of (string?) data
-    bool Insert(const double *pos, Handle<Value> data){
+    /**
+     * Insert a set of points into the tree.
+     *
+     * An optional data argument is present as well; 
+     * if len == dim_, then the data param will be ignored.
+     *
+     * @param pos   An array of points
+     * @param len   Number of points in the array
+     * @param data  Optional data argument
+     *
+     * @return true if the point was inserted successfully, false otherwise
+     */ 
+    bool Insert(const double *pos, int len, Handle<Value> data){
+      if (len == dim_)
+        return (kd_insert(kd_, pos, NULL) == 0);
       return (kd_insert(kd_, pos, *data) == 0);
     }
 
-    // Allow retrieval of (string?) data
+    /**
+     * Find the point nearest to the given point.
+     *
+     * @return An array containing the nearest point, or an empty array if no point is found.
+     *         If a data element was provided for the nearest point, it will be the last
+     *         member of the returned array.
+     */ 
     Handle<Value>
     Nearest(const double *pos){
       int rpos;
@@ -51,8 +70,7 @@ class KDTree : public ObjectWrap {
       kdres *results = kd_nearest(kd_, pos);
       Local<Array> rv = Array::New(dim_ + 1);
 
-      if (results == NULL){}
-      else{
+      if (results != NULL) {
         double *respos = (double *)(malloc(sizeof(double) * dim_));
         pdata = (void *)kd_res_item(results, respos); 
 
@@ -60,12 +78,14 @@ class KDTree : public ObjectWrap {
           rv->Set(rpos, Number::New(respos[rpos])); 
         }
 
-// TODO: any way to get that data back?
-Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
-        rv->Set(dim_, hdata); // TODO: append data element here
-//         Number::New( (void *)pdata ));
-//        Number::New(respos[rpos])); 
-       
+        // Append data element, if present
+        if (pdata != NULL) {
+          Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
+          // TODO: somehow need to dispose of the persistent handle, and perhaps
+          // allocate a new var with a local (?) handle
+          rv->Set(dim_, hdata); 
+        }
+
         free(respos);
         kd_res_free(results);
       }
@@ -110,6 +130,9 @@ Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
 
   protected:
 
+    /**
+     * Wrapper for Insert()
+     */
     static Handle<Value>
     Insert(const Arguments& args){
         KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
@@ -120,23 +143,18 @@ Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
         pos[i] = args[i]->NumberValue();
       }
 
-// TODO: pass data parameter down using a persistent handle?
-// http://izs.me/v8-docs/classv8_1_1Persistent.html#_details
-//
-// TODO:
-// if this is the case, need to pass as arg, then in Insert() need to
-// validate that num args == dim_
-//
-      // TODO: may want to pass Length down, so class can assert == dim_ 
-      Handle<Value> result = Boolean::New( kd->Insert(pos,
-          Persistent<Value>::New(args[0]) // Test code, just stuff number as data for now...
-                                    // Eventually will want API to allow an optional data arg.
-                                    // If not specified, will default to something (null?)
-          ) );
+      Handle<Value> result = Boolean::New( kd->Insert(pos, args.Length(),
+          Persistent<Value>::New(args[ args.Length() - 1])));
+            // Test code, just stuff number as data for now...
+            // Eventually will want API to allow an optional data arg.
+            // If not specified, will default to something (null?)
       free(pos);
       return result;
     }
 
+    /**
+     * Wrapper for Nearest()
+     */ 
     static Handle<Value>
     Nearest(const Arguments& args){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
@@ -158,6 +176,9 @@ Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
 //    static Handle<Value>
 //    NearestRange(const Arguments& args){}
 
+    /**
+     *
+     */
     static Handle<Value>
     New (const Arguments& args){
         HandleScope scope;
