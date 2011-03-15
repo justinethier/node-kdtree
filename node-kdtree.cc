@@ -185,7 +185,7 @@ class KDTree : public ObjectWrap {
 //    NearestRange(const Arguments& args){}
 
     /**
-     *
+     * "External" constructor called by the Addon framework
      */
     static Handle<Value>
     New (const Arguments& args){
@@ -202,12 +202,20 @@ class KDTree : public ObjectWrap {
         return args.This();
     }
 
+    /**
+     * Constructor
+     *
+     * @param dim   Dimensions of each point in the tree
+     */
     KDTree (int dim) : ObjectWrap (){
         kd_ = kd_create(dim);
         dim_ = dim;
         kd_data_destructor(kd_, freeNodeData);
     }
 
+    /**
+     * Destructor
+     */
     ~KDTree(){
         if (kd_ != NULL){
             kd_free(kd_);
@@ -226,7 +234,14 @@ class KDTree : public ObjectWrap {
     }*/
 
   private:
+    /**
+     * Pointer to the tree itself
+     */
     kdtree* kd_;
+
+    /**
+     * Dimension of each point in the tree
+     */
     int dim_;
 };
 
