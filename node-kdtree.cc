@@ -91,8 +91,6 @@ class KDTree : public ObjectWrap {
         // Append data element, if present
         if (pdata != NULL) {
           Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
-          // TODO: somehow need to dispose of the persistent handle, and perhaps
-          // allocate a new var with a local (?) handle
           rv->Set(dim_, hdata); 
         }
 
@@ -193,12 +191,9 @@ class KDTree : public ObjectWrap {
     New (const Arguments& args){
         HandleScope scope;
 
-// TODO: an example of how to handle arguments to constructor
-//Async *async = new Async(args[0]->Int32Value(), args[1]->Int32Value());
-
         int dimension = 3; // Default
         if (args.Length() > 0){
-          dimension = args[3]->Int32Value();
+          dimension = args[0]->Int32Value();
         }
 
         KDTree *kd = new KDTree(dimension);
@@ -214,8 +209,6 @@ class KDTree : public ObjectWrap {
     }
 
     ~KDTree(){
-      // TODO: need to call this to clean up allocated 'data' elements
-      //       see the kdtree docs:
         if (kd_ != NULL){
             kd_free(kd_);
         }
