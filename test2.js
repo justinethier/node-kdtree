@@ -11,9 +11,10 @@ var kd = require('kdtree');
 var tree = new kd.KDTree();
 
 console.log( "Loading data into tree..." );
+var i = 0;
 for (var x = 0; x < 75; x++){
   for (var y = 0; y < 75; y++){
     for (var z = 0; z < 75; z++){
-      tree.insert(x, y, z); }}}
+      tree.insert(x, y, z, "element #" + i++); }}}
 console.log( "Done loading the tree" );
 console.log( tree.nearest(9.5, 19.5, 31.5) );
