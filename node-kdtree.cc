@@ -61,8 +61,8 @@ class KDTree : public ObjectWrap {
         }
 
 // TODO: any way to get that data back?
-//Handle<Value> hdata = Handle::Cast((Value *)pdata);
-//        rv->Set(dim_, // TODO: append data element here
+Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
+        rv->Set(dim_, hdata); // TODO: append data element here
 //         Number::New( (void *)pdata ));
 //        Number::New(respos[rpos])); 
        
