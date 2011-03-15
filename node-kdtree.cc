@@ -19,6 +19,17 @@
 using namespace v8;
 using namespace node;
 
+/**
+ * Free memory allocated to the 'data' portion of a node...
+ */
+void freeNodeData(void *data){
+  if (data != NULL) {
+    // Release this persistent handle's storage cell
+    Persistent<Value> hData = Persistent<Value>::Persistent((Value *)data);
+    hData.Dispose();
+  }
+}
+
 class KDTree : public ObjectWrap {
   public:
     static void
@@ -30,7 +41,6 @@ class KDTree : public ObjectWrap {
         t->InstanceTemplate()->SetInternalFieldCount(1);
         t->SetClassName(String::NewSymbol("KDTree"));
 
-        NODE_SET_PROTOTYPE_METHOD(t, "test", Test); // TODO: this will go away...
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
         NODE_SET_PROTOTYPE_METHOD(t, "nearest", Nearest);
 //        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange); // kd_nearest_range
@@ -92,7 +102,7 @@ class KDTree : public ObjectWrap {
       return rv;
     }
 
-    int Test()
+    /*int Test()
     {
        int i, vcount = 10;
        kdtree *kd;
@@ -126,7 +136,7 @@ class KDTree : public ObjectWrap {
     
        kd_free(kd);
        return i;
-    }
+    }*/
 
   protected:
 
@@ -200,18 +210,18 @@ class KDTree : public ObjectWrap {
     KDTree (int dim) : ObjectWrap (){
         kd_ = kd_create(dim);
         dim_ = dim;
+        kd_data_destructor(kd_, freeNodeData);
     }
 
     ~KDTree(){
       // TODO: need to call this to clean up allocated 'data' elements
       //       see the kdtree docs:
-//      void kd_data_destructor(struct kdtree *tree, void (*destr)(void*));
         if (kd_ != NULL){
             kd_free(kd_);
         }
     }
 
-    static Handle<Value>
+    /*static Handle<Value>
     Test (const Arguments& args){
         KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
 
@@ -220,7 +230,7 @@ class KDTree : public ObjectWrap {
         int num = kd->Test();
 
         return Integer::New(num); // Undefined();
-    }
+    }*/
 
   private:
     kdtree* kd_;
