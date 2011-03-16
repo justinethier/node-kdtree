@@ -25,11 +25,8 @@ def build(bld):
   obj.uselib = 'KD'
 
 #
-# TODO: see this link
+# Added test command, based upon assert testing. See:
 # http://debuggable.com/posts/unit-testing-with-node-js:4b647d40-34e4-435a-a880-3b04cbdd56cb
-#
-# Change our tests over to use node.js assert and call into *all* the tests from 
-# node-waf test
 #
 def test(tst):
   status = Utils.exec_command('node tests/test.js && node tests/test2.js');
