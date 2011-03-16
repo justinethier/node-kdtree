@@ -32,6 +32,6 @@ def build(bld):
 # node-waf test
 #
 def test(tst):
-  status = Utils.exec_command('node tests/test.js');
+  status = Utils.exec_command('node tests/test.js && node tests/test2.js');
   if status != 0:
      raise Utils.WafError('tests failed');
