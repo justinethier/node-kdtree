@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Basic libkdtree binding to node",
   "author": "Justin Ethier",
-  "main": "./kdtree",
+  "main": "build/default/kdtree.node",
   "scripts": {
     "install": "node-waf configure build",
     "test": "node-waf test"
