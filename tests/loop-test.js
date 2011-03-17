@@ -15,9 +15,9 @@ console.log( "Loading data into tree, this may take awhile..." );
 var i = 0;
 for (var x = 0; x < 75; x++){
   for (var y = 0; y < 75; y++){
-      tree.insert(x, y, "element #" + i++); }}
+      tree.insert(x, y); }}
 
 for (var x = 0; x < 75; x++){
   for (var y = 0; y < 75; y++){
-    assert.deepEqual( tree.nearest(x, y), [x, y], "Failed test for [" + x + "," + y + "]" ); }}
+    assert.deepEqual( tree.nearest(x, y), [x, y], "Failed test for [" + x + "," + y + "]. Nearest is" + tree.nearest(x, y) ); }}
 
