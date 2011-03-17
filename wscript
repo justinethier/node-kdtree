@@ -29,6 +29,6 @@ def build(bld):
 # http://debuggable.com/posts/unit-testing-with-node-js:4b647d40-34e4-435a-a880-3b04cbdd56cb
 #
 def test(tst):
-  status = Utils.exec_command('node tests/baseline-test.js && node tests/large-dataset-test.js');
+  status = Utils.exec_command('node tests/baseline-test.js && node tests/large-dataset-test.js && node tests/loop-test.js');
   if status != 0:
      raise Utils.WafError('tests failed');
