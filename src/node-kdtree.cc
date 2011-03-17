@@ -80,7 +80,11 @@ class KDTree : public ObjectWrap {
       kdres *results = kd_nearest(kd_, pos);
       Local<Array> rv = Array::New(dim_ + 1);
 
-// TODO: exception if len != dim_
+      if (len != dim_){
+        ThrowException(Exception::Error(String::New("Nearest(): Wrong number of parameters."))); 
+        // FUTURE: Passed: " + len + " Expected: " + dim_)));
+      }
+
       if (results != NULL) {
         double *respos = (double *)(malloc(sizeof(double) * dim_));
         pdata = (void *)kd_res_item(results, respos); 
