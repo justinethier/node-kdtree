@@ -61,6 +61,11 @@ class KDTree : public ObjectWrap {
      * @return true if the point was inserted successfully, false otherwise
      */ 
     bool Insert(const double *pos, int len, Handle<Value> data){
+      if (len != dim_ && len != dim_ + 1){
+        ThrowException(Exception::Error(String::New("Insert(): Wrong number of parameters."))); 
+        // FUTURE: Passed: " + len + " Expected: " + dim_)));
+      }
+
       if (len == dim_)
         return (kd_insert(kd_, pos, NULL) == 0);
       return (kd_insert(kd_, pos, *data) == 0);
