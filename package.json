@@ -1,16 +1,30 @@
-{ "name" : "kdtree"
-, "version" : "0.0.1"
-, "description" : "Basic libkdtree binding to node"
-, "author": "Justin Ethier"
-, "main": "./kdtree"
-, "scripts": { "install": "node-waf configure build" }
-, "repository" :
-  { "type" : "git"
-  , "url" : "git://github.com/justinethier/node-kdtree"
-  }
-, "licenses" :
-  [ { "type" : "MIT"
-    , "url" : "http://github.com/justinethier/node-kdtree/raw/master/LICENSE"
+{
+  "name": "kdtree",
+  "version": "0.0.1",
+  "description": "Basic libkdtree binding to node",
+  "author": "Justin Ethier",
+  "main": "./kdtree",
+  "scripts": {
+    "install": "node-waf configure build",
+    "test": "node-waf test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/justinethier/node-kdtree.git"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/justinethier/node-kdtree/raw/master/LICENSE"
     }
+  ],
+  "engines": {
+    "node": "*"
+  },
+  "directories": {
+    "lib": "."
+  },
+  "files": [
+    ""
   ]
 }
