@@ -74,12 +74,13 @@ class KDTree : public ObjectWrap {
      *         member of the returned array.
      */ 
     Handle<Value>
-    Nearest(const double *pos){
+    Nearest(const double *pos, int len){
       int rpos;
       void *pdata;
       kdres *results = kd_nearest(kd_, pos);
       Local<Array> rv = Array::New(dim_ + 1);
 
+// TODO: exception if len != dim_
       if (results != NULL) {
         double *respos = (double *)(malloc(sizeof(double) * dim_));
         pdata = (void *)kd_res_item(results, respos); 
@@ -173,8 +174,7 @@ class KDTree : public ObjectWrap {
         pos[i] = args[i]->NumberValue();
       }
 
-      // TODO: may want to pass Length down, so class can assert == dim_ 
-      Handle<Value> result = kd->Nearest(pos); 
+      Handle<Value> result = kd->Nearest(pos, args.Length()); 
         
       free(pos);
       return result;
