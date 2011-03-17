@@ -13,13 +13,13 @@ tree.insert(1, 1.9, 3);
 //tree.insert(1, 2, 3);
 tree.insert(1, 11.1, 4);
 tree.insert(10, 20, 30);
-console.log( tree.nearest(9, 19, 31) );
-console.log( tree.nearest(0, 0, 0) );
-console.log( tree.nearest(0.5, 2, 4) );
-console.log( tree.nearest(1, 11, 4) );
-console.log( tree.nearest(100, 11000, 4000) );
-console.log( tree.nearest(100, -11000, 4000) );
-console.log( tree.nearest(1, 0, 0) );
+assert.deepEqual( tree.nearest(9, 19, 31), [10, 20, 30]);
+assert.deepEqual( tree.nearest(0, 0, 0), [1, 1.9, 3]);
+assert.deepEqual( tree.nearest(0.5, 2, 4), [1, 2, 3]);
+assert.deepEqual( tree.nearest(1, 11, 4), [1, 11.1, 4]);
+assert.deepEqual( tree.nearest(100, 11000, 4000), [10, 20, 30]);
+assert.deepEqual( tree.nearest(100, -11000, 4000), [1, 1.9, 3]);
+assert.deepEqual( tree.nearest(1, 0, 0), [1, 1.9, 3]);
 
 // Test using a second tree of different dimension
 var tree2 = new kd.KDTree(4);

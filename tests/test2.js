@@ -7,6 +7,7 @@
  * Please use github to submit patches and bug reports:
  * https://github.com/justinethier/node-kdtree
  */
+var assert = require('assert');
 var kd = require('kdtree');
 var tree = new kd.KDTree(4);
 
@@ -17,5 +18,5 @@ for (var x = 0; x < 75; x++){
     for (var z = 0; z < 75; z++){
       tree.insert(x, y, z, 4, "element #" + i++); }}}
 console.log( "Done loading the tree" );
-console.log( tree.nearest(9.5, 19.5, 31.5, 0) );
-console.log( tree.nearest(0, 0, 0, 0) );
+assert.deepEqual( tree.nearest(9.5, 19.5, 31.5, 0), [10, 19, 32, 4, 'element #57707'] );
+assert.deepEqual( tree.nearest(0, 0, 0, 0), [0, 0, 0, 4, 'element #0'] );
