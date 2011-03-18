@@ -56,7 +56,7 @@ class KDTree : public ObjectWrap {
     /**
      * Return dimensions of the tree's points.
      */
-    integer Dimensions(){
+    int Dimensions(){
       return dim_;
     }
 
