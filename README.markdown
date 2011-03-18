@@ -1,7 +1,5 @@
-node-kdtree
-====================================
+#node-kdtree
 
-## DESCRIPTION
 node-kdtree is a node.js Addon that defines a wrapper to libkdtree, allowing one to work with KD trees directly in node. A [KD tree](http://en.wikipedia.org/wiki/Kd-tree) is may be used to organize points in a multi-dimensional space, and in particular is useful for performing nearest neighbor searches.
 
 ## Dependencies
