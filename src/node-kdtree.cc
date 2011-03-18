@@ -41,17 +41,23 @@ class KDTree : public ObjectWrap {
         t->InstanceTemplate()->SetInternalFieldCount(1);
         t->SetClassName(String::NewSymbol("KDTree"));
 
+        NODE_SET_PROTOTYPE_METHOD(t, "dimensions", Dimensions);
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
         NODE_SET_PROTOTYPE_METHOD(t, "nearest", Nearest);
 //        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange); // kd_nearest_range
-//
-// TODO: method to get the current dimensions
 //
 // TODO: methods to get the nearest point, and nearest data.
 //       ideally could be written in js, but C++ is fine too. Idea is that most usage
 //       would probably just be for one or the other, and not the combined list
 
         target->Set(String::NewSymbol("KDTree"), t->GetFunction());
+    }
+
+    /**
+     * Return dimensions of the tree's points.
+     */
+    integer Dimensions(){
+      return dim_;
     }
 
     /**
@@ -153,6 +159,14 @@ class KDTree : public ObjectWrap {
     }*/
 
   protected:
+
+    static Handle<Value>
+    Dimensions (const Arguments& args){
+        KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
+        HandleScope scope;
+
+        return Number::New(kd->Dimensions());
+    }
 
     /**
      * Wrapper for Insert()
