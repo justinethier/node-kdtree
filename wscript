@@ -4,6 +4,7 @@
 #
 
 import Utils
+from logging import fatal
 
 srcdir = 'src'
 blddir = 'build'
@@ -15,6 +16,9 @@ def set_options(opt):
 def configure(conf):
   conf.check_tool('compiler_cxx')
   conf.check_tool('node_addon')
+  if not conf.check(lib='kdtree'):
+     if not conf.check(lib="kdtree", libpath=['/usr/local/lib', '/opt/local/lib'], uselib_store="KD"):
+                   fatal("libkdtree not found.")
   conf.env.append_value("LIBPATH_KD", '/usr/lib')
   conf.env.append_value("LIB_KD", 'kdtree')
 
