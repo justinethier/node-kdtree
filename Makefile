@@ -12,3 +12,11 @@ clean:
 
 uninstall:
 	node-waf uninstall
+
+# Install npm package
+dist:
+	rm -rf build
+	npm install
+
+dist-uninstall:
+	npm uninstall kdtree
