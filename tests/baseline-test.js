@@ -36,3 +36,6 @@ assert.deepEqual(tree2.nearest(1, 10, 10, 1),
 assert.deepEqual( tree.nearest(10, 10, 10),
                   [ 1, 11.1, 4 ],
                   "Verify original tree can still be searched");
+
+assert.equal( tree.dimensions(), 3);
+assert.equal( tree2.dimensions(), 4);
