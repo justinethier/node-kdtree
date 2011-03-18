@@ -6,7 +6,7 @@
 import Utils
 from logging import fatal
 
-srcdir = 'src'
+srcdir = '.'
 blddir = 'build'
 VERSION = '0.0.1'
 
