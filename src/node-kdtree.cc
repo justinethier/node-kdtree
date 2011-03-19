@@ -44,7 +44,7 @@ class KDTree : public ObjectWrap {
         NODE_SET_PROTOTYPE_METHOD(t, "dimensions", Dimensions);
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
         NODE_SET_PROTOTYPE_METHOD(t, "nearest", Nearest);
-//        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange); // kd_nearest_range
+        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange);
 //
 // TODO: methods to get the nearest point, and nearest data.
 //       ideally could be written in js, but C++ is fine too. Idea is that most usage
@@ -122,6 +122,44 @@ class KDTree : public ObjectWrap {
       return rv;
     }
 
+    Handle<Value> 
+    NearestRange(const double *pos, int len, double range){
+      int rpos, i = 0;
+      void *pdata;
+      kdres *results = kd_nearest_range(kd_, pos, range);
+      Local<Array> rv = Array::New();
+
+      if (len != dim_){
+        ThrowException(Exception::Error(String::New("Nearest(): Wrong number of parameters."))); 
+        // FUTURE: Passed: " + len + " Expected: " + dim_)));
+      }
+
+      while (!kd_res_end( results )){
+        Local<Array> rvItem = Array::New(dim_ + 1);
+        double *respos = (double *)(malloc(sizeof(double) * dim_));
+        pdata = (void *)kd_res_item(results, respos); 
+
+        for(rpos = 0; rpos < dim_; rpos++){
+          rvItem->Set(rpos, Number::New(respos[rpos])); 
+        }
+
+        // Append data element, if present
+        if (pdata != NULL) {
+          Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
+          rvItem->Set(dim_, hdata); 
+        }
+
+        rv->Set(i++, rvItem);
+        free(respos);
+
+        // Move to next result entry
+        kd_res_next( results );
+      }
+
+      kd_res_free(results);
+      return rv;
+    }
+
     /*int Test()
     {
        int i, vcount = 10;
@@ -176,6 +214,8 @@ class KDTree : public ObjectWrap {
         KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
         HandleScope scope;
 
+// TODO: range checking
+
       double *pos = (double *)(malloc(sizeof(double) * args.Length()));
       for (int i = 0; i < args.Length(); i++){
         pos[i] = args[i]->NumberValue();
@@ -198,6 +238,8 @@ class KDTree : public ObjectWrap {
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
       HandleScope scope;
 
+// TODO: range checking
+
       double *pos = (double *)(malloc(sizeof(double) * args.Length()));
       for (int i = 0; i < args.Length(); i++){
         pos[i] = args[i]->NumberValue();
@@ -209,9 +251,23 @@ class KDTree : public ObjectWrap {
       return result;
     }
 
-// TODO:
-//    static Handle<Value>
-//    NearestRange(const Arguments& args){}
+    static Handle<Value>
+    NearestRange(const Arguments& args){
+      KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
+      HandleScope scope;
+      
+// TODO: range checking here
+
+      double *pos = (double *)(malloc(sizeof(double) * args.Length() - 1));
+      for (int i = 0; i < args.Length() - 1; i++){
+        pos[i] = args[i]->NumberValue();
+      }
+
+      Handle<Value> result = kd->NearestRange(pos, args.Length() - 1, args[args.Length() - 1]->NumberValue()); 
+        
+      free(pos);
+      return result;
+    }
 
     /**
      * "External" constructor called by the Addon framework
