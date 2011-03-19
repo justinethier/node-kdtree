@@ -37,6 +37,22 @@ The `nearest` method is used to find the point in the tree that is closest to a 
 
 `nearest` will return an array containing closest point, or an empty array if no points were found. As shown above, if the point contains a data value, that value will also be returned at the end of the array.
 
+
+A `nearestRange` method is also provided, which allows us to find all of the points within a given range. For example:
+
+    > tree.nearestRange(0, 0, 3);
+    [ [ 1, 1 ],
+      [ 0, 2 ],
+      [ 2, 0 ],
+      [ 1, 0 ],
+      [ 0, 1 ],
+      [ 0, 0 ] ]
+
+The first arguments to `nearestRange` are the components of the point to begin searching at. The last argument is the search range.
+
+##API
+Coming soon!
+
 ##Credits
 
 node-kdtree is developed by [Justin Ethier](http://github.com/justinethier).
