@@ -16,9 +16,19 @@ var i = 0;
 for (var x = 0; x < 75; x++){
   for (var y = 0; y < 75; y++){
       tree.insert(x, y); }}
-/*
-for (var x = 0; x < 75; x++){
-  for (var y = 0; y < 75; y++){
-    assert.deepEqual( tree.nearest(x, y), [x, y], "Failed test for [" + x + "," + y + "]. Nearest is" + tree.nearest(x, y) ); }}
-*/
-console.log( tree.nearestRange(0, 0, 3));
+
+assert.deepEqual(
+  tree.nearestRange(0, 0, 3), 
+  [ [ 2, 2 ],
+    [ 2, 1 ],
+    [ 1, 2 ],
+    [ 1, 1 ],
+    [ 0, 3 ],
+    [ 0, 2 ],
+    [ 3, 0 ],
+    [ 2, 0 ],
+    [ 1, 0 ],
+    [ 0, 1 ],
+    [ 0, 0 ] ]);
+
+//console.log( tree.nearestRange(-10, -10, 2));
