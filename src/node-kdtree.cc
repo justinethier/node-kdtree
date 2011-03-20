@@ -6,8 +6,6 @@
  * https://github.com/justinethier/node-kdtree
  */
 
-// TODO: publish via npm. see: https://github.com/isaacs/npm/blob/master/doc/developers.md#readme
-//
 #include <v8.h>
 #include <node.h>
 #include <node_events.h>
@@ -30,6 +28,9 @@ void freeNodeData(void *data){
   }
 }
 
+/**
+ * The KDTree add-on
+ */
 class KDTree : public ObjectWrap {
   public:
     static void
@@ -44,17 +45,23 @@ class KDTree : public ObjectWrap {
         NODE_SET_PROTOTYPE_METHOD(t, "dimensions", Dimensions);
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
         NODE_SET_PROTOTYPE_METHOD(t, "nearest", Nearest);
-        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange);
 //
-// TODO: methods to get the nearest point, and nearest data.
-//       ideally could be written in js, but C++ is fine too. Idea is that most usage
-//       would probably just be for one or the other, and not the combined list
+//      FUTURE: 2 methods below to get the nearest point, and nearest data.
+//              Ideally could be written in js, but C++ is fine too. Idea is that most usage
+//              would probably just be for one or the other, and not the combined list...
+//
+//        NODE_SET_PROTOTYPE_METHOD(t, "nearestPoint", NearestPoint);
+//        NODE_SET_PROTOTYPE_METHOD(t, "nearestValue", NearestValue);
+//
+        NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange);
 
         target->Set(String::NewSymbol("KDTree"), t->GetFunction());
     }
 
     /**
-     * Return dimensions of the tree's points.
+     * Getter for tree's dimensions.
+     *
+     * @return Dimensions of the tree's points.
      */
     int Dimensions(){
       return dim_;
@@ -85,6 +92,9 @@ class KDTree : public ObjectWrap {
 
     /**
      * Find the point nearest to the given point.
+     *
+     * @param pos   An array of points
+     * @param len   Number of points in the array
      *
      * @return An array containing the nearest point, or an empty array if no point is found.
      *         If a data element was provided for the nearest point, it will be the last
@@ -122,6 +132,17 @@ class KDTree : public ObjectWrap {
       return rv;
     }
 
+    /**
+     * Find the points nearest to the given point, within a given range.
+     *
+     * @param pos   An array of points
+     * @param len   Number of points in the array
+     * @param range Range in which to search for points
+     *
+     * @return An array containing the nearest points, or an empty array if no point is found.
+     *         If a data element was provided for any point, it will be the last
+     *         member of that point's returned array.
+     */ 
     Handle<Value> 
     NearestRange(const double *pos, int len, double range){
       int rpos, i = 0;
@@ -160,42 +181,6 @@ class KDTree : public ObjectWrap {
       return rv;
     }
 
-    /*int Test()
-    {
-       int i, vcount = 10;
-       kdtree *kd;
-       kdres *set;
-    //   unsigned int msec, start;
-    
-       printf("inserting %d random vectors... ", vcount);
-       fflush(stdout);
-    
-       kd = kd_create(3);
-    
-    //   start = get_msec();
-       for(i=0; i<vcount; i++) {
-               float x, y, z;
-               x = ((float)rand() / RAND_MAX) * 200.0 - 100.0;
-               y = ((float)rand() / RAND_MAX) * 200.0 - 100.0;
-               z = ((float)rand() / RAND_MAX) * 200.0 - 100.0;
-    
-               assert(kd_insert3(kd, x, y, z, 0) == 0);
-       }
-    //   msec = get_msec() - start;
-    //   printf("%.3f sec\n", (float)msec / 1000.0);
-    
-    //   start = get_msec();
-       set = kd_nearest_range3(kd, 0, 0, 0, 100);
-    //   msec = get_msec() - start;
-    //
-       i = kd_res_size(set);
-       printf("range query returned %d items\n", kd_res_size(set));
-       kd_res_free(set);
-    
-       kd_free(kd);
-       return i;
-    }*/
-
   protected:
 
     static Handle<Value>
@@ -223,9 +208,6 @@ class KDTree : public ObjectWrap {
 
       Handle<Value> result = Boolean::New( kd->Insert(pos, args.Length(),
           Persistent<Value>::New(args[ args.Length() - 1])));
-            // Test code, just stuff number as data for now...
-            // Eventually will want API to allow an optional data arg.
-            // If not specified, will default to something (null?)
       free(pos);
       return result;
     }
@@ -251,6 +233,25 @@ class KDTree : public ObjectWrap {
       return result;
     }
 
+/* FUTURE:
+    static Handle<Value>
+    NearestPoint(const Arguments& args){
+      return KDTree::Nearest(args);
+    }
+
+    static Handle<Value>
+    NearestValue(const Arguments& args){
+      HandleScope scope;
+//      Handle<Array> array = Handle<Array>::Cast(KDTree::Nearest(args));
+      Local<Array> arry = Array::New(KDTree::Nearest(args));
+      Local<Array> result = Array::New(); 
+      if (arry->Length() > 0){
+        result->Set(0, String::New("todo")); //arry[arry->Length() - 1]->Value());
+      }
+
+      return result;
+    }
+*/
     static Handle<Value>
     NearestRange(const Arguments& args){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
@@ -307,17 +308,6 @@ class KDTree : public ObjectWrap {
         }
     }
 
-    /*static Handle<Value>
-    Test (const Arguments& args){
-        KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
-
-        HandleScope scope;
-
-        int num = kd->Test();
-
-        return Integer::New(num); // Undefined();
-    }*/
-
   private:
     /**
      * Pointer to the tree itself
@@ -330,6 +320,9 @@ class KDTree : public ObjectWrap {
     int dim_;
 };
 
+/**
+ * Entry point required by node.js framework
+ */
 extern "C" void
 init (Handle<Object> target)
 {
