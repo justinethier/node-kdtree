@@ -51,7 +51,7 @@ class KDTree : public ObjectWrap {
 //              would probably just be for one or the other, and not the combined list...
 //
 //        NODE_SET_PROTOTYPE_METHOD(t, "nearestPoint", NearestPoint);
-//        NODE_SET_PROTOTYPE_METHOD(t, "nearestValue", NearestValue);
+        NODE_SET_PROTOTYPE_METHOD(t, "nearestValue", NearestValue);
 //
         NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange);
 
@@ -130,6 +130,8 @@ class KDTree : public ObjectWrap {
         kd_res_free(results);
       }
       return rv;
+//      TODO: perhaps need to call this, to support NearestValue:
+//      scope.Close(Number::New(getpid()));
     }
 
     /**
@@ -233,7 +235,7 @@ class KDTree : public ObjectWrap {
       return result;
     }
 
-/* FUTURE:
+// FUTURE:
     static Handle<Value>
     NearestPoint(const Arguments& args){
       return KDTree::Nearest(args);
@@ -241,17 +243,28 @@ class KDTree : public ObjectWrap {
 
     static Handle<Value>
     NearestValue(const Arguments& args){
-      HandleScope scope;
-//      Handle<Array> array = Handle<Array>::Cast(KDTree::Nearest(args));
-      Local<Array> arry = Array::New(KDTree::Nearest(args));
-      Local<Array> result = Array::New(); 
-      if (arry->Length() > 0){
-        result->Set(0, String::New("todo")); //arry[arry->Length() - 1]->Value());
+//      HandleScope scope;
+      Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
+
+      printf("length = %d\n", nearest->Length());
+//      Local<Value> nearest = KDTree::Nearest(args);
+//      Handle<Array> arry = nearest.As<Array>();
+//      Local<Array> arry = nearest.As<Array>();
+ //     Local<Array> result = Array::New(1); 
+      if (nearest->Length() > 0){
+//        result->Set(0, Number::New(nearest->Length()));
+        printf("setting to length())");
+        //(*arry)
+//          [arry->Length() - 1].Value());
+//        result->Set(0, String::New("todo")); //arry[arry->Length() - 1]->Value());
+      } else {
+        printf("else, length = %d\n", nearest->Length());
       }
 
-      return result;
+      return nearest;
+//      return result;
     }
-*/
+
     static Handle<Value>
     NearestRange(const Arguments& args){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
