@@ -102,6 +102,7 @@ class KDTree : public ObjectWrap {
      */ 
     Handle<Value>
     Nearest(const double *pos, int len){
+      HandleScope scope;
       int rpos;
       void *pdata;
       kdres *results = kd_nearest(kd_, pos);
@@ -129,9 +130,12 @@ class KDTree : public ObjectWrap {
         free(respos);
         kd_res_free(results);
       }
-      return rv;
+//      return rv;
+      return scope.Close(rv);
 //      TODO: perhaps need to call this, to support NearestValue:
 //      scope.Close(Number::New(getpid()));
+//
+//      perhaps everywhere there is a value returned from handlescope, should close scope and return it??
     }
 
     /**
@@ -232,7 +236,7 @@ class KDTree : public ObjectWrap {
       Handle<Value> result = kd->Nearest(pos, args.Length()); 
         
       free(pos);
-      return result;
+      return scope.Close(result);
     }
 
 // FUTURE:
@@ -243,26 +247,17 @@ class KDTree : public ObjectWrap {
 
     static Handle<Value>
     NearestValue(const Arguments& args){
-//      HandleScope scope;
+      HandleScope scope;
       Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
+      int dim = 3; // TODO: KDTree::Dimensions(args)->Value();
 
-      printf("length = %d\n", nearest->Length());
-//      Local<Value> nearest = KDTree::Nearest(args);
-//      Handle<Array> arry = nearest.As<Array>();
-//      Local<Array> arry = nearest.As<Array>();
- //     Local<Array> result = Array::New(1); 
-      if (nearest->Length() > 0){
-//        result->Set(0, Number::New(nearest->Length()));
-        printf("setting to length())");
-        //(*arry)
-//          [arry->Length() - 1].Value());
-//        result->Set(0, String::New("todo")); //arry[arry->Length() - 1]->Value());
-      } else {
-        printf("else, length = %d\n", nearest->Length());
+      Local<Array> result = Array::New(1); 
+      if (nearest->Length() > 0 &&       // Data present
+          nearest->Length() == (dim + 1)){ // Value present
+        result->Set(0, nearest->Get(nearest->Length() - 1));
       }
 
-      return nearest;
-//      return result;
+      return result;
     }
 
     static Handle<Value>
