@@ -9,6 +9,11 @@ The [kdtree](http://code.google.com/p/kdtree/) C library is required. In order t
     make
     sudo make install PREFIX=/usr 
 
+## Installation
+The easiest way to install node-kdtree is to use the [npm](https://github.com/isaacs/npm) package manager:
+
+    npm install kdtree
+
 ## Usage
 
 ###Creating a tree
