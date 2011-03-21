@@ -52,20 +52,7 @@ The first arguments to `nearestRange` are the components of the point to begin s
 
 ##API
 
-<hr />
-###dimensions
-Get the dimensions of the tree.
-
-<hr />
-insert
-<hr />
-nearest
-<hr />
-nearestPoint
-<hr />
-nearestValue
-<hr />
-nearestRange
+[API documentation](API.markdown)
 
 ##Credits
 
