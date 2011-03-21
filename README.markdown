@@ -51,7 +51,21 @@ A `nearestRange` method is also provided, which allows us to find all of the poi
 The first arguments to `nearestRange` are the components of the point to begin searching at. The last argument is the search range.
 
 ##API
-Coming soon!
+
+<hr />
+###dimensions
+Get the dimensions of the tree.
+
+<hr />
+insert
+<hr />
+nearest
+<hr />
+nearestPoint
+<hr />
+nearestValue
+<hr />
+nearestRange
 
 ##Credits
 
