@@ -45,14 +45,8 @@ class KDTree : public ObjectWrap {
         NODE_SET_PROTOTYPE_METHOD(t, "dimensions", Dimensions);
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
         NODE_SET_PROTOTYPE_METHOD(t, "nearest", Nearest);
-//
-//      FUTURE: 2 methods below to get the nearest point, and nearest data.
-//              Ideally could be written in js, but C++ is fine too. Idea is that most usage
-//              would probably just be for one or the other, and not the combined list...
-//
-//        NODE_SET_PROTOTYPE_METHOD(t, "nearestPoint", NearestPoint);
+        NODE_SET_PROTOTYPE_METHOD(t, "nearestPoint", NearestPoint);
         NODE_SET_PROTOTYPE_METHOD(t, "nearestValue", NearestValue);
-//
         NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange);
 
         target->Set(String::NewSymbol("KDTree"), t->GetFunction());
@@ -239,17 +233,37 @@ class KDTree : public ObjectWrap {
       return scope.Close(result);
     }
 
-// FUTURE:
+    /**
+     * A shortcut method for Nearest, that returns an array containing only point data.
+     * If a value is present, it will NOT be returned in the result array.
+     */
     static Handle<Value>
     NearestPoint(const Arguments& args){
-      return KDTree::Nearest(args);
+      HandleScope scope;
+      Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
+      int dim = KDTree::Dimensions(args).As<Number>()->Value();
+
+      Local<Array> result = Array::New(dim); 
+      if (nearest->Length() > 0 &&    // Data present
+          nearest->Length() >= dim) { // Points present
+         for (int i = 0; i < dim; i++) {
+           result->Set(i, nearest->Get(i));
+         }
+      }
+
+      return scope.Close(result);
     }
 
+    // TODO: Return as a scalar instead of an array
+    /**
+     * A shortcut method for Nearest, that returns an array containing only the point's value.
+     * If a value is not present or no point was found, the returned array will be empty.
+     */
     static Handle<Value>
     NearestValue(const Arguments& args){
       HandleScope scope;
       Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
-      int dim = 3; // TODO: KDTree::Dimensions(args)->Value();
+      int dim = KDTree::Dimensions(args).As<Number>()->Value();
 
       Local<Array> result = Array::New(1); 
       if (nearest->Length() > 0 &&       // Data present
@@ -257,7 +271,7 @@ class KDTree : public ObjectWrap {
         result->Set(0, nearest->Get(nearest->Length() - 1));
       }
 
-      return result;
+      return scope.Close(result);
     }
 
     static Handle<Value>

@@ -39,3 +39,12 @@ assert.deepEqual( tree.nearest(10, 10, 10),
 
 assert.equal( tree.dimensions(), 3);
 assert.equal( tree2.dimensions(), 4);
+
+// Test shortcut methods for point / value
+var treeS = new kd.KDTree();
+treeS.insert(1, 1, 1, "test");
+treeS.insert(2, 2, 2);
+assert.deepEqual( treeS.nearestValue(0, 0, 0), ["test"] );
+assert.deepEqual( treeS.nearestValue(3, 3, 3), [] );
+assert.deepEqual( treeS.nearestPoint(0, 0, 0), [1, 1, 1] );
+assert.deepEqual( treeS.nearestPoint(3, 3, 3), [2, 2, 2] );
