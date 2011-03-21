@@ -124,12 +124,7 @@ class KDTree : public ObjectWrap {
         free(respos);
         kd_res_free(results);
       }
-//      return rv;
       return scope.Close(rv);
-//      TODO: perhaps need to call this, to support NearestValue:
-//      scope.Close(Number::New(getpid()));
-//
-//      perhaps everywhere there is a value returned from handlescope, should close scope and return it??
     }
 
     /**
@@ -145,6 +140,7 @@ class KDTree : public ObjectWrap {
      */ 
     Handle<Value> 
     NearestRange(const double *pos, int len, double range){
+      HandleScope scope;
       int rpos, i = 0;
       void *pdata;
       kdres *results = kd_nearest_range(kd_, pos, range);
@@ -178,7 +174,7 @@ class KDTree : public ObjectWrap {
       }
 
       kd_res_free(results);
-      return rv;
+      return scope.Close(rv);
     }
 
   protected:
@@ -188,7 +184,7 @@ class KDTree : public ObjectWrap {
         KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
         HandleScope scope;
 
-        return Number::New(kd->Dimensions());
+        return scope.Close(Number::New(kd->Dimensions()));
     }
 
     /**
@@ -209,7 +205,7 @@ class KDTree : public ObjectWrap {
       Handle<Value> result = Boolean::New( kd->Insert(pos, args.Length(),
           Persistent<Value>::New(args[ args.Length() - 1])));
       free(pos);
-      return result;
+      return scope.Close(result);
     }
 
     /**
@@ -289,7 +285,7 @@ class KDTree : public ObjectWrap {
       Handle<Value> result = kd->NearestRange(pos, args.Length() - 1, args[args.Length() - 1]->NumberValue()); 
         
       free(pos);
-      return result;
+      return scope.Close(result);
     }
 
     /**
@@ -307,7 +303,7 @@ class KDTree : public ObjectWrap {
         KDTree *kd = new KDTree(dimension);
         kd->Wrap(args.This());
 
-        return args.This();
+        return scope.Close(args.This());
     }
 
     /**
