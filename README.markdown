@@ -52,7 +52,7 @@ The first arguments to `nearestRange` are the components of the point to begin s
 
 ##API
 
-[API documentation](https://github.com/justinethier/node-kdtree/blob/master/API.markdown)
+[API documentation](https://github.com/justinethier/node-kdtree/blob/master/doc/API.markdown)
 
 ##Credits
 
