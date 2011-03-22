@@ -99,14 +99,15 @@ class KDTree : public ObjectWrap {
       HandleScope scope;
       int rpos;
       void *pdata;
-      kdres *results = kd_nearest(kd_, pos);
-      Local<Array> rv = Array::New(dim_ + 1);
 
       if (len != dim_){
         ThrowException(Exception::Error(String::New("Nearest(): Wrong number of parameters."))); 
         // FUTURE: Passed: " + len + " Expected: " + dim_)));
       }
 
+      kdres *results = kd_nearest(kd_, pos);
+      Local<Array> rv = Array::New(dim_ + 1);
+      
       if (results != NULL) {
         double *respos = (double *)(malloc(sizeof(double) * dim_));
         pdata = (void *)kd_res_item(results, respos); 
@@ -143,7 +144,7 @@ class KDTree : public ObjectWrap {
       HandleScope scope;
       int rpos, i = 0;
       void *pdata;
-      kdres *results = kd_nearest_range(kd_, pos, range);
+      kdres *results = NULL; 
       Local<Array> rv = Array::New();
 
       if (len != dim_){
@@ -151,6 +152,7 @@ class KDTree : public ObjectWrap {
         // FUTURE: Passed: " + len + " Expected: " + dim_)));
       }
 
+      results = kd_nearest_range(kd_, pos, range);
       while (!kd_res_end( results )){
         Local<Array> rvItem = Array::New(dim_ + 1);
         double *respos = (double *)(malloc(sizeof(double) * dim_));
@@ -192,10 +194,8 @@ class KDTree : public ObjectWrap {
      */
     static Handle<Value>
     Insert(const Arguments& args){
-        KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
-        HandleScope scope;
-
-// TODO: range checking
+      KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
+      HandleScope scope;
 
       double *pos = (double *)(malloc(sizeof(double) * args.Length()));
       for (int i = 0; i < args.Length(); i++){
@@ -215,8 +215,6 @@ class KDTree : public ObjectWrap {
     Nearest(const Arguments& args){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
       HandleScope scope;
-
-// TODO: range checking
 
       double *pos = (double *)(malloc(sizeof(double) * args.Length()));
       for (int i = 0; i < args.Length(); i++){
@@ -274,17 +272,21 @@ class KDTree : public ObjectWrap {
     NearestRange(const Arguments& args){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
       HandleScope scope;
-      
-// TODO: range checking here
+      Handle<Value> result; 
 
-      double *pos = (double *)(malloc(sizeof(double) * args.Length() - 1));
-      for (int i = 0; i < args.Length() - 1; i++){
-        pos[i] = args[i]->NumberValue();
+      if (args.Length() == 0) {
+        ThrowException(Exception::Error(String::New("NearestRange(): No parameters were provided."))); 
+      }
+      else {
+        double *pos = (double *)(malloc(sizeof(double) * args.Length() - 1));
+        for (int i = 0; i < args.Length() - 1; i++){
+          pos[i] = args[i]->NumberValue();
+        }
+
+        result = kd->NearestRange(pos, args.Length() - 1, args[args.Length() - 1]->NumberValue()); 
+        free(pos);
       }
 
-      Handle<Value> result = kd->NearestRange(pos, args.Length() - 1, args[args.Length() - 1]->NumberValue()); 
-        
-      free(pos);
       return scope.Close(result);
     }
 
