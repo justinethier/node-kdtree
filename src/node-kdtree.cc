@@ -248,10 +248,16 @@ class KDTree : public ObjectWrap {
       return scope.Close(result);
     }
 
-    // TODO: Return as a scalar instead of an array
     /**
-     * A shortcut method for Nearest, that returns an array containing only the point's value.
-     * If a value is not present or no point was found, the returned array will be empty.
+     * A shortcut method for Nearest, that returns the point's value as a scalar.
+     * If a value is not present or no point was found, this method returns null.
+     *
+     * For example:
+     *
+     *  > tree.insert(1, 1, 1, "My Value");
+     *  > tree.nearestValue(1, 1, 1);
+     *  "My Value"
+     *
      */
     static Handle<Value>
     NearestValue(const Arguments& args){
@@ -259,10 +265,10 @@ class KDTree : public ObjectWrap {
       Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
       int dim = KDTree::Dimensions(args).As<Number>()->Value();
 
-      Local<Array> result = Array::New(1); 
+      Local<Value> result; // Initialize to null
       if (nearest->Length() > 0 &&       // Data present
           nearest->Length() == (dim + 1)){ // Value present
-        result->Set(0, nearest->Get(nearest->Length() - 1));
+        result = nearest->Get(nearest->Length() - 1);
       }
 
       return scope.Close(result);
