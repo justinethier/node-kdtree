@@ -1,6 +1,6 @@
 {
   "name": "kdtree",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Basic libkdtree binding to node",
   "author": "Justin Ethier",
   "main": "build/default/kdtree.node",
