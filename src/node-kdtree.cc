@@ -265,13 +265,12 @@ class KDTree : public ObjectWrap {
       Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
       int dim = KDTree::Dimensions(args).As<Number>()->Value();
 
-      Local<Value> result; // Initialize to null
-      if (nearest->Length() > 0 &&       // Data present
+      if (nearest->Length() > 0 &&         // Data present
           nearest->Length() == (dim + 1)){ // Value present
-        result = nearest->Get(nearest->Length() - 1);
+        return scope.Close( nearest->Get(nearest->Length() - 1) );
+      } else {
+        return scope.Close( Null() );
       }
-
-      return scope.Close(result);
     }
 
     static Handle<Value>
