@@ -1,3 +1,8 @@
+v0.0.4
+----
+- Internal changes to nearestValue() to ensure null is returned instead of
+undefined.
+
 v0.0.3
 ----
 - Modified nearestValue() to return a scalar value instead of an array
