@@ -8,7 +8,6 @@
 
 #include <v8.h>
 #include <node.h>
-#include <node_events.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -23,7 +22,7 @@ using namespace node;
 void freeNodeData(void *data){
   if (data != NULL) {
     // Release this persistent handle's storage cell
-    Persistent<Value> hData = Persistent<Value>::Persistent((Value *)data);
+    Persistent<Value> hData = Persistent<Value>((Value *)data);
     hData.Dispose();
   }
 }
@@ -118,7 +117,7 @@ class KDTree : public ObjectWrap {
 
         // Append data element, if present
         if (pdata != NULL) {
-          Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
+          Persistent<Value> hdata = Persistent<Value>((Value *)pdata);
           rv->Set(dim_, hdata); 
         }
 
@@ -164,7 +163,7 @@ class KDTree : public ObjectWrap {
 
         // Append data element, if present
         if (pdata != NULL) {
-          Persistent<Value> hdata = Persistent<Value>::Persistent((Value *)pdata);
+          Persistent<Value> hdata = Persistent<Value>((Value *)pdata);
           rvItem->Set(dim_, hdata); 
         }
 
