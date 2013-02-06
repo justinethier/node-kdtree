@@ -2,16 +2,8 @@
   'targets': [
     {
       'target_name': 'kdtree',
-      'sources': [ 'src/node-kdtree.cc' ],
-#      'conditions' : [
-#        ['OS=="linux"', {
-#          'link_settings': {
-#            'libraries': [
-#              '-lkdtree'
-#            ]
-#          }
-#        }]
-#      ]
+      'sources': [ 'src/lib/kdtree.c', 'src/node-kdtree.cc' ],
+      'include_dirs': [ './src/lib' ]
     }
   ]
 }
