@@ -6,7 +6,7 @@
  * https://github.com/justinethier/node-kdtree
  */
 var assert = require('assert');
-var kd = require('kdtree');
+var kd = require('../build/Release/kdtree');
 var tree = new kd.KDTree();
 tree.insert(1, 2, 3);
 tree.insert(1, 1.9, 3);
