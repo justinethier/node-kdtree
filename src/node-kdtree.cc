@@ -347,10 +347,5 @@ class KDTree : public ObjectWrap {
 /**
  * Entry point required by node.js framework
  */
-extern "C" void
-init (Handle<Object> target)
-{
-    HandleScope scope;
-    KDTree::Initialize(target);
-}
+NODE_MODULE(kdtree,KDTree::Initialize)
 
