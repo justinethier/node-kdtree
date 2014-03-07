@@ -8,6 +8,7 @@
 
 #include <v8.h>
 #include <node.h>
+#include <node_version.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -238,7 +239,7 @@ class KDTree : public ObjectWrap {
 
       Local<Array> result = Array::New(dim); 
       if (nearest->Length() > 0 &&    // Data present
-          nearest->Length() >= dim) { // Points present
+          (int)nearest->Length() >= dim) { // Points present
          for (int i = 0; i < dim; i++) {
            result->Set(i, nearest->Get(i));
          }
@@ -347,10 +348,13 @@ class KDTree : public ObjectWrap {
 /**
  * Entry point required by node.js framework
  */
+#if NODE_MAJOR_VERSION == 0 && NODE_MINOR_VERSION < 10
 extern "C" void
 init (Handle<Object> target)
 {
     HandleScope scope;
     KDTree::Initialize(target);
 }
-
+#else
+NODE_MODULE(kdtree,KDTree::Initialize)
+#endif
