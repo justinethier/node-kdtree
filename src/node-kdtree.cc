@@ -266,7 +266,7 @@ class KDTree : public ObjectWrap {
       int dim = KDTree::Dimensions(args).As<Number>()->Value();
 
       if (nearest->Length() > 0 &&         // Data present
-          nearest->Length() == (dim + 1)){ // Value present
+          (int)nearest->Length() == (dim + 1)){ // Value present
         return scope.Close( nearest->Get(nearest->Length() - 1) );
       } else {
         return scope.Close( Null() );
