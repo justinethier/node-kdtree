@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <nan.h>
 #include <kdtree.h>
 
 using namespace v8;
@@ -23,8 +24,9 @@ using namespace node;
 void freeNodeData(void *data){
   if (data != NULL) {
     // Release this persistent handle's storage cell
-    Persistent<Value> hData = Persistent<Value>((Value *)data);
-    hData.Dispose();
+    Persistent<Value>* hData = (Persistent<Value>*)data;
+    NanDisposePersistent(*hData);
+    delete hData;
   }
 }
 
@@ -35,12 +37,12 @@ class KDTree : public ObjectWrap {
   public:
     static void
     Initialize (v8::Handle<v8::Object> target){
-        HandleScope scope;
+        NanScope();
 
-        Local<FunctionTemplate> t = FunctionTemplate::New(New);
+        Local<FunctionTemplate> t = NanNew<FunctionTemplate>(New);
 
         t->InstanceTemplate()->SetInternalFieldCount(1);
-        t->SetClassName(String::NewSymbol("KDTree"));
+        t->SetClassName(NanNew<String>("KDTree"));
 
         NODE_SET_PROTOTYPE_METHOD(t, "dimensions", Dimensions);
         NODE_SET_PROTOTYPE_METHOD(t, "insert", Insert);
@@ -49,7 +51,7 @@ class KDTree : public ObjectWrap {
         NODE_SET_PROTOTYPE_METHOD(t, "nearestValue", NearestValue);
         NODE_SET_PROTOTYPE_METHOD(t, "nearestRange", NearestRange);
 
-        target->Set(String::NewSymbol("KDTree"), t->GetFunction());
+        target->Set(NanNew<String>("KDTree"), t->GetFunction());
     }
 
     /**
@@ -73,15 +75,15 @@ class KDTree : public ObjectWrap {
      *
      * @return true if the point was inserted successfully, false otherwise
      */ 
-    bool Insert(const double *pos, int len, Handle<Value> data){
+    bool Insert(const double *pos, int len, Persistent<Value>* data){
       if (len != dim_ && len != dim_ + 1){
-        ThrowException(Exception::Error(String::New("Insert(): Wrong number of parameters."))); 
+        NanThrowError("Insert(): Wrong number of parameters.");
         // FUTURE: Passed: " + len + " Expected: " + dim_)));
       }
 
       if (len == dim_)
         return (kd_insert(kd_, pos, NULL) == 0);
-      return (kd_insert(kd_, pos, *data) == 0);
+      return (kd_insert(kd_, pos, data) == 0);
     }
 
     /**
@@ -96,36 +98,37 @@ class KDTree : public ObjectWrap {
      */ 
     Handle<Value>
     Nearest(const double *pos, int len){
-      HandleScope scope;
+      NanEscapableScope();
       int rpos;
       void *pdata;
 
       if (len != dim_){
-        ThrowException(Exception::Error(String::New("Nearest(): Wrong number of parameters."))); 
+        NanThrowError("Nearest(): Wrong number of parameters.");
         // FUTURE: Passed: " + len + " Expected: " + dim_)));
       }
 
       kdres *results = kd_nearest(kd_, pos);
-      Local<Array> rv = Array::New(dim_ + 1);
+      Local<Array> rv = NanNew<Array>(dim_ + 1);
       
       if (results != NULL) {
         double *respos = (double *)(malloc(sizeof(double) * dim_));
         pdata = (void *)kd_res_item(results, respos); 
 
         for(rpos = 0; rpos < dim_; rpos++){
-          rv->Set(rpos, Number::New(respos[rpos])); 
+          rv->Set(rpos, NanNew<Number>(respos[rpos])); 
         }
 
         // Append data element, if present
         if (pdata != NULL) {
-          Persistent<Value> hdata = Persistent<Value>((Value *)pdata);
-          rv->Set(dim_, hdata); 
+          Persistent<Value>* hdata = (Persistent<Value>*)pdata;
+          Local<Value> value = NanNew(*hdata);
+          rv->Set(dim_, value);
         }
 
         free(respos);
         kd_res_free(results);
       }
-      return scope.Close(rv);
+      return NanEscapeScope(rv);
     }
 
     /**
@@ -141,31 +144,32 @@ class KDTree : public ObjectWrap {
      */ 
     Handle<Value> 
     NearestRange(const double *pos, int len, double range){
-      HandleScope scope;
+      NanEscapableScope();
       int rpos, i = 0;
       void *pdata;
       kdres *results = NULL; 
-      Local<Array> rv = Array::New();
+      Local<Array> rv = NanNew<Array>();
 
       if (len != dim_){
-        ThrowException(Exception::Error(String::New("Nearest(): Wrong number of parameters."))); 
+        NanThrowError("Nearest(): Wrong number of parameters.");
         // FUTURE: Passed: " + len + " Expected: " + dim_)));
       }
 
       results = kd_nearest_range(kd_, pos, range);
       while (!kd_res_end( results )){
-        Local<Array> rvItem = Array::New(dim_ + 1);
+        Local<Array> rvItem = NanNew<Array>(dim_ + 1);
         double *respos = (double *)(malloc(sizeof(double) * dim_));
         pdata = (void *)kd_res_item(results, respos); 
 
         for(rpos = 0; rpos < dim_; rpos++){
-          rvItem->Set(rpos, Number::New(respos[rpos])); 
+          rvItem->Set(rpos, NanNew<Number>(respos[rpos])); 
         }
 
         // Append data element, if present
         if (pdata != NULL) {
-          Persistent<Value> hdata = Persistent<Value>((Value *)pdata);
-          rvItem->Set(dim_, hdata); 
+          Persistent<Value>* hdata = (Persistent<Value>*)pdata;
+          Local<Value> value = NanNew(*hdata);
+          rvItem->Set(dim_, value);
         }
 
         rv->Set(i++, rvItem);
@@ -176,45 +180,45 @@ class KDTree : public ObjectWrap {
       }
 
       kd_res_free(results);
-      return scope.Close(rv);
+      return NanEscapeScope(rv);
     }
 
   protected:
 
-    static Handle<Value>
-    Dimensions (const Arguments& args){
+    static Handle<Value> _Dimensions(_NAN_METHOD_ARGS){
+        NanEscapableScope();
         KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
-        HandleScope scope;
+        return NanEscapeScope(NanNew<Number>(kd->Dimensions()));
+    }
 
-        return scope.Close(Number::New(kd->Dimensions()));
+    static NAN_METHOD(Dimensions){
+        NanScope();
+        NanReturnValue(KDTree::_Dimensions(args));
     }
 
     /**
      * Wrapper for Insert()
      */
-    static Handle<Value>
-    Insert(const Arguments& args){
+    static NAN_METHOD(Insert){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
-      HandleScope scope;
+      NanScope();
 
       double *pos = (double *)(malloc(sizeof(double) * args.Length()));
       for (int i = 0; i < args.Length(); i++){
         pos[i] = args[i]->NumberValue();
       }
 
-      Handle<Value> result = Boolean::New( kd->Insert(pos, args.Length(),
-          Persistent<Value>::New(args[ args.Length() - 1])));
+      Persistent<Value>* per = new Persistent<Value>();
+      NanAssignPersistent(*per, args[ args.Length() - 1 ]);
+
+      Handle<Value> result = NanNew<Boolean>( kd->Insert(pos, args.Length(), per) );
       free(pos);
-      return scope.Close(result);
+      NanReturnValue(result);
     }
 
-    /**
-     * Wrapper for Nearest()
-     */ 
-    static Handle<Value>
-    Nearest(const Arguments& args){
+    static Handle<Value> _Nearest(_NAN_METHOD_ARGS){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
-      HandleScope scope;
+      NanEscapableScope();
 
       double *pos = (double *)(malloc(sizeof(double) * args.Length()));
       for (int i = 0; i < args.Length(); i++){
@@ -224,20 +228,28 @@ class KDTree : public ObjectWrap {
       Handle<Value> result = kd->Nearest(pos, args.Length()); 
         
       free(pos);
-      return scope.Close(result);
+      return NanEscapeScope(result);
+    }
+
+    /**
+     * Wrapper for Nearest()
+     */ 
+    static NAN_METHOD(Nearest){
+      NanScope();
+      Handle<Value> result = KDTree::_Nearest(args);
+      NanReturnValue(result);
     }
 
     /**
      * A shortcut method for Nearest, that returns an array containing only point data.
      * If a value is present, it will NOT be returned in the result array.
      */
-    static Handle<Value>
-    NearestPoint(const Arguments& args){
-      HandleScope scope;
-      Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
-      int dim = KDTree::Dimensions(args).As<Number>()->Value();
+    static NAN_METHOD(NearestPoint){
+      NanScope();
+      Handle<Array> nearest = KDTree::_Nearest(args).As<Array>();
+      int dim = KDTree::_Dimensions(args).As<Number>()->Value();
 
-      Local<Array> result = Array::New(dim); 
+      Local<Array> result = NanNew<Array>(dim); 
       if (nearest->Length() > 0 &&    // Data present
           (int)nearest->Length() >= dim) { // Points present
          for (int i = 0; i < dim; i++) {
@@ -245,7 +257,7 @@ class KDTree : public ObjectWrap {
          }
       }
 
-      return scope.Close(result);
+      NanReturnValue(result);
     }
 
     /**
@@ -259,28 +271,26 @@ class KDTree : public ObjectWrap {
      *  "My Value"
      *
      */
-    static Handle<Value>
-    NearestValue(const Arguments& args){
-      HandleScope scope;
-      Handle<Array> nearest = ((KDTree::Nearest(args))).As<Array>();
-      int dim = KDTree::Dimensions(args).As<Number>()->Value();
+    static NAN_METHOD(NearestValue){
+      NanScope();
+      Handle<Array> nearest = KDTree::_Nearest(args).As<Array>();
+      int dim = KDTree::_Dimensions(args).As<Number>()->Value();
 
       if (nearest->Length() > 0 &&         // Data present
           (int)nearest->Length() == (dim + 1)){ // Value present
-        return scope.Close( nearest->Get(nearest->Length() - 1) );
+        NanReturnValue( nearest->Get(nearest->Length() - 1) );
       } else {
-        return scope.Close( Null() );
+        NanReturnNull();
       }
     }
 
-    static Handle<Value>
-    NearestRange(const Arguments& args){
+    static NAN_METHOD(NearestRange){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(args.This());
-      HandleScope scope;
+      NanScope();
       Handle<Value> result; 
 
       if (args.Length() == 0) {
-        ThrowException(Exception::Error(String::New("NearestRange(): No parameters were provided."))); 
+        NanThrowError("NearestRange(): No parameters were provided."); 
       }
       else {
         double *pos = (double *)(malloc(sizeof(double) * args.Length() - 1));
@@ -292,15 +302,14 @@ class KDTree : public ObjectWrap {
         free(pos);
       }
 
-      return scope.Close(result);
+      NanReturnValue(result);
     }
 
     /**
      * "External" constructor called by the Addon framework
      */
-    static Handle<Value>
-    New (const Arguments& args){
-        HandleScope scope;
+    static NAN_METHOD(New){
+        NanScope();
 
         int dimension = 3; // Default
         if (args.Length() > 0){
@@ -310,7 +319,7 @@ class KDTree : public ObjectWrap {
         KDTree *kd = new KDTree(dimension);
         kd->Wrap(args.This());
 
-        return scope.Close(args.This());
+        NanReturnValue(args.This());
     }
 
     /**
