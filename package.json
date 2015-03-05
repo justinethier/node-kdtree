@@ -18,6 +18,9 @@
     }
   ],
   "engines": {
-      "node": ">=v0.8.x"
+    "node": ">=v0.8.x"
+  },
+  "dependencies": {
+    "nan": "~1.7.0"
   }
 }
