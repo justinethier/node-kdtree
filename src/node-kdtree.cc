@@ -8,10 +8,10 @@
 
 #include <v8.h>
 #include <node.h>
-#include <node_version.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cassert>
+#include <sstream>
 #include <nan.h>
 #include <kdtree.h>
 
@@ -24,7 +24,7 @@ using namespace node;
 void freeNodeData(void *data){
   if (data != NULL) {
     // Release this persistent handle's storage cell
-    Persistent<Value>* hData = (Persistent<Value>*)data;
+    Nan::Persistent<Value>* hData = (Nan::Persistent<Value>*)data;
     hData->Reset();
     delete hData;
   }
@@ -66,7 +66,7 @@ class KDTree : public ObjectWrap {
      *
      * @return true if the point was inserted successfully, false otherwise
      */ 
-    bool Insert(const double *pos, int len, Persistent<Value>* data){
+    bool Insert(const double *pos, int len, Nan::Persistent<Value>* data){
       if (len != dim_ && len != dim_ + 1){
         Nan::ThrowError("Insert(): Wrong number of parameters.");
         // FUTURE: Passed: " + len + " Expected: " + dim_)));
@@ -87,8 +87,7 @@ class KDTree : public ObjectWrap {
      *         If a data element was provided for the nearest point, it will be the last
      *         member of the returned array.
      */ 
-    Handle<Value>
-    Nearest(const double *pos, int len){
+    Local<Value> Nearest(const double *pos, int len){
       Nan::EscapableHandleScope scope;
       int rpos;
       void *pdata;
@@ -111,7 +110,7 @@ class KDTree : public ObjectWrap {
 
         // Append data element, if present
         if (pdata != NULL) {
-          Persistent<Value>* hdata = (Persistent<Value>*)pdata;
+          Nan::Persistent<Value>* hdata = (Nan::Persistent<Value>*)pdata;
           Local<Value> value = Nan::New(*hdata);
           rv->Set(dim_, value);
         }
@@ -133,8 +132,7 @@ class KDTree : public ObjectWrap {
      *         If a data element was provided for any point, it will be the last
      *         member of that point's returned array.
      */ 
-    Handle<Value> 
-    NearestRange(const double *pos, int len, double range){
+    Local<Value> NearestRange(const double *pos, int len, double range){
       Nan::EscapableHandleScope scope;
       int rpos, i = 0;
       void *pdata;
@@ -142,8 +140,10 @@ class KDTree : public ObjectWrap {
       Local<Array> rv = Nan::New<Array>();
 
       if (len != dim_){
-        Nan::ThrowError("Nearest(): Wrong number of parameters.");
-        // FUTURE: Passed: " + len + " Expected: " + dim_)));
+        std::stringstream ss;
+        ss << "Nearest(): Wrong number of parameters. Passed: "
+           << len << " Expected: " << dim_;
+        Nan::ThrowError(Nan::New(ss.str()).ToLocalChecked());
       }
 
       results = kd_nearest_range(kd_, pos, range);
@@ -158,7 +158,7 @@ class KDTree : public ObjectWrap {
 
         // Append data element, if present
         if (pdata != NULL) {
-          Persistent<Value>* hdata = (Persistent<Value>*)pdata;
+          Nan::Persistent<Value>* hdata = (Nan::Persistent<Value>*)pdata;
           Local<Value> value = Nan::New(*hdata);
           rvItem->Set(dim_, value);
         }
@@ -176,7 +176,7 @@ class KDTree : public ObjectWrap {
 
   protected:
 
-    static Handle<Value> _Dimensions(Nan::NAN_METHOD_ARGS_TYPE info){
+    static Local<Value> _Dimensions(Nan::NAN_METHOD_ARGS_TYPE info){
         Nan::EscapableHandleScope scope;
         KDTree *kd = ObjectWrap::Unwrap<KDTree>(info.This());
         return scope.Escape(Nan::New<Number>(kd->dim_));
@@ -200,12 +200,12 @@ class KDTree : public ObjectWrap {
       Local<Value> data = info[ info.Length() - 1 ];
       Nan::Persistent<Value>* per = new Nan::Persistent<Value>(data);
 
-      Handle<Value> result = Nan::New<Boolean>( kd->Insert(pos, info.Length(), per) );
+      Local<Value> result = Nan::New<Boolean>( kd->Insert(pos, info.Length(), per) );
       delete[] pos;
       info.GetReturnValue().Set(result);
     }
 
-    static Handle<Value> _Nearest(Nan::NAN_METHOD_ARGS_TYPE info){
+    static Local<Value> _Nearest(Nan::NAN_METHOD_ARGS_TYPE info){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(info.This());
       Nan::EscapableHandleScope scope;
 
@@ -214,7 +214,7 @@ class KDTree : public ObjectWrap {
         pos[i] = info[i]->NumberValue();
       }
 
-      Handle<Value> result = kd->Nearest(pos, info.Length()); 
+      Local<Value> result = kd->Nearest(pos, info.Length()); 
         
       delete[] pos;
       return scope.Escape(result);
@@ -225,7 +225,7 @@ class KDTree : public ObjectWrap {
      */ 
     static NAN_METHOD(Nearest){
       Nan::HandleScope scope;
-      Handle<Value> result = KDTree::_Nearest(info);
+      Local<Value> result = KDTree::_Nearest(info);
       info.GetReturnValue().Set(result);
     }
 
@@ -276,7 +276,7 @@ class KDTree : public ObjectWrap {
     static NAN_METHOD(NearestRange){
       KDTree *kd = ObjectWrap::Unwrap<KDTree>(info.This());
       Nan::HandleScope scope;
-      Handle<Value> result; 
+      Local<Value> result; 
 
       if (info.Length() == 0) {
         Nan::ThrowError("NearestRange(): No parameters were provided."); 
