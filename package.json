@@ -1,6 +1,6 @@
 {
   "name": "kdtree",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Basic libkdtree binding to node",
   "author": "Justin Ethier",
   "main": "./build/Release/kdtree",
@@ -11,16 +11,11 @@
     "type": "git",
     "url": "git://github.com/justinethier/node-kdtree.git"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/justinethier/node-kdtree/raw/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "engines": {
-    "node": ">=v0.8.x"
+    "node": ">=v4.6.x"
   },
   "dependencies": {
-    "nan": "~1.9.0"
+    "nan": "2.4.x"
   }
 }
