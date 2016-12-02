@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=v4.6.x"
+    "node": ">=v0.8.x"
   },
   "dependencies": {
     "nan": "2.4.x"
