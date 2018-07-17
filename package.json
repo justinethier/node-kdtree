@@ -16,6 +16,6 @@
     "node": ">=v0.8.x"
   },
   "dependencies": {
-    "nan": "2.4.x"
+    "nan": "2.10.x"
   }
 }
